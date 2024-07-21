@@ -10,7 +10,7 @@
 
 	<groupId>com.tosan.tools.tracker</groupId>
 	<artifactId>tosan-tracker</artifactId>
-	<version>0.0.6-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>pom</packaging>
 	<description>
 		This project provides a Spring Boot Starter for tracking incoming and outgoing requests and responses.
@@ -42,7 +42,7 @@
 		<connection>scm:git:https://github.com/Tosan/tosan-tracker.git</connection>
 		<developerConnection>scm:git:https://github.com/Tosan/tosan-tracker.git</developerConnection>
 		<url>https://github.com/Tosan/tosan-tracker</url>
-		<tag>HEAD</tag>
+		<tag>v1.0.0</tag>
 	</scm>
 
 	<properties>
