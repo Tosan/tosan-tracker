@@ -24,6 +24,15 @@
 		</license>
 	</licenses>
 
+	<developers>
+		<developer>
+			<name>Fatemeh Ebrahimi</name>
+			<email>F.Ebrahimi@tosan.com</email>
+			<organization>tosan</organization>
+			<organizationUrl>https://www.tosan.com</organizationUrl>
+		</developer>
+	</developers>
+
 	<modules>
 		<module>tosan-tracker-spring-boot-starter</module>
 		<module>tosan-tracker-sample</module>
