@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.deser.std.UntypedObjectDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.tosan.tools.mask.starter.config.SecureParameter;
 import com.tosan.tools.mask.starter.config.SecureParametersConfig;
@@ -110,6 +111,7 @@ public class TrackerConfiguration {
         mapper.setAnnotationIntrospector(new FieldIgnoreIntrospector());
         if (!resourceBundle.getAllDocumentations().isEmpty()) {
             module.addKeyDeserializer(Object.class, trackerKeyDeserializer);
+            module.addDeserializer(Object.class, new UntypedObjectDeserializer(null, null));
         }
         mapper.registerModule(module);
         return mapper;
