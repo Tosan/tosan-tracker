@@ -8,6 +8,7 @@
     </parent>
 
     <artifactId>tosan-tracker-spring-boot-starter</artifactId>
+    <name>tosan-tracker-spring-boot-starter</name>
 
     <dependencies>
         <dependency>
