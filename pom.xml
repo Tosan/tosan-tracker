@@ -10,7 +10,7 @@
 
 	<groupId>com.tosan.tools.tracker</groupId>
 	<artifactId>tosan-tracker</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.2</version>
 	<packaging>pom</packaging>
 
     <name>tosan-tracker</name>
@@ -44,7 +44,7 @@
 		<connection>scm:git:https://github.com/Tosan/tosan-tracker.git</connection>
 		<developerConnection>scm:git:https://github.com/Tosan/tosan-tracker.git</developerConnection>
 		<url>https://github.com/Tosan/tosan-tracker</url>
-		<tag>HEAD</tag>
+		<tag>v1.0.2</tag>
 	</scm>
 
 	<properties>
