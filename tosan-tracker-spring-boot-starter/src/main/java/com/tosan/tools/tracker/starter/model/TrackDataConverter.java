@@ -1,7 +1,7 @@
 package com.tosan.tools.tracker.starter.model;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.persistence.AttributeConverter;
+import tools.jackson.core.JacksonException;
 
 import java.util.Map;
 
@@ -18,7 +18,7 @@ public class TrackDataConverter implements AttributeConverter<Map<String, Object
         }
         try {
             return TrackerStaticMapper.objectMapper.writeValueAsString(trackData);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException("invalid json: {}", e);
         }
     }
@@ -31,7 +31,7 @@ public class TrackDataConverter implements AttributeConverter<Map<String, Object
         }
         try {
             return TrackerStaticMapper.objectMapper.readValue(trackData, Map.class);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException("invalid json: {}", e);
         }
     }
