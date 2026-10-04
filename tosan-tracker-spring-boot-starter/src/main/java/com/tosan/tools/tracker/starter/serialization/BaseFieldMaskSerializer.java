@@ -1,18 +1,17 @@
 package com.tosan.tools.tracker.starter.serialization;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonStreamContext;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
-
-import java.io.IOException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.TokenStreamContext;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
 /**
  * @author AmirHossein ZamanZade
  * @since 5/15/2023
  */
-public class BaseFieldMaskSerializer extends JsonSerializer<String> {
+public class BaseFieldMaskSerializer extends ValueSerializer<String> {
 
     public BaseFieldMaskSerializer() {
     }
@@ -23,16 +22,16 @@ public class BaseFieldMaskSerializer extends JsonSerializer<String> {
         this.jsonReplaceHelperDecider = jsonReplaceHelperDecider;
     }
 
-    public void serialize(String value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
-            throws IOException {
+    public void serialize(String value, JsonGenerator jsonGenerator, SerializationContext serializationContext)
+            throws JacksonException {
         if (value == null) {
             return;
         }
-        String fieldName = jsonGenerator.getOutputContext().getCurrentName();
+        String fieldName = jsonGenerator.streamWriteContext().currentName();
         if (fieldName == null) {
-            JsonStreamContext parent = jsonGenerator.getOutputContext().getParent();
+            TokenStreamContext parent = jsonGenerator.streamWriteContext().getParent();
             if (parent != null) {
-                fieldName = parent.getCurrentName();
+                fieldName = parent.currentName();
             }
         }
         String maskedValue = jsonReplaceHelperDecider.replace(fieldName, value);

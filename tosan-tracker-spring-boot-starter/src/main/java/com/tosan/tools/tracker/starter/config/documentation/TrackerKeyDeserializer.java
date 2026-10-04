@@ -1,7 +1,7 @@
 package com.tosan.tools.tracker.starter.config.documentation;
 
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.KeyDeserializer;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.KeyDeserializer;
 
 /**
  * @author M.khoshnevisan

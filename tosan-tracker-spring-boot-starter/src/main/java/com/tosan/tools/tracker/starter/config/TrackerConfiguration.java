@@ -1,11 +1,6 @@
 package com.tosan.tools.tracker.starter.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.deser.std.UntypedObjectDeserializer;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.tosan.tools.mask.starter.config.SecureParameter;
 import com.tosan.tools.mask.starter.config.SecureParametersConfig;
 import com.tosan.tools.mask.starter.replace.JacksonReplaceHelper;
@@ -14,19 +9,25 @@ import com.tosan.tools.mask.starter.replace.RegexReplaceHelper;
 import com.tosan.tools.tracker.starter.aspect.TrackerAspect;
 import com.tosan.tools.tracker.starter.config.documentation.DocumentationResourceBundle;
 import com.tosan.tools.tracker.starter.config.documentation.TrackerKeyDeserializer;
-import com.tosan.tools.tracker.starter.service.TrackerService;
 import com.tosan.tools.tracker.starter.dao.RequestTrackDao;
 import com.tosan.tools.tracker.starter.dao.ResponseTrackDao;
 import com.tosan.tools.tracker.starter.model.TrackerStaticMapper;
 import com.tosan.tools.tracker.starter.serialization.*;
 import com.tosan.tools.tracker.starter.service.ExceptionHandlerUtil;
+import com.tosan.tools.tracker.starter.service.TrackerService;
 import com.tosan.tools.tracker.starter.service.TrackerServiceImpl;
-import com.tosan.tools.tracker.starter.util.AnnotationUtil;
 import com.tosan.tools.tracker.starter.service.TrackingDataProvider;
+import com.tosan.tools.tracker.starter.util.AnnotationUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.deser.jdk.UntypedObjectDeserializer;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
@@ -84,7 +85,7 @@ public class TrackerConfiguration {
         return new TrackerKeyDeserializer(documentationResourceBundle);
     }
 
-    @Bean("tracker-mask-object-mapper")
+    @Bean(name = "tracker-mask-object-mapper", autowireCandidate = false)
     public ObjectMapper trackerObjectMapper(
             @Qualifier("tracker-field-base-mask-serializer") BaseFieldMaskSerializer baseFieldMaskSerializer,
             @Qualifier("tracker-documentation-resource-bundle") DocumentationResourceBundle documentationResourceBundle,
@@ -94,27 +95,28 @@ public class TrackerConfiguration {
 
     private static ObjectMapper createTrackerObjectMapper(
             BaseFieldMaskSerializer baseFieldMaskSerializer,
-            @Qualifier("tracker-documentation-resource-bundle") DocumentationResourceBundle resourceBundle,
-            @Qualifier("tracker-key-deserializer") TrackerKeyDeserializer trackerKeyDeserializer
+            DocumentationResourceBundle resourceBundle,
+            TrackerKeyDeserializer trackerKeyDeserializer
     ) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT)
-                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         SimpleModule module = new SimpleModule();
         module.addAbstractTypeMapping(Map.class, LinkedHashMap.class);
         module.addSerializer(String.class, new StringSerializer(baseFieldMaskSerializer));
         module.addSerializer(Number.class, new NumberSerializer(baseFieldMaskSerializer));
         module.addSerializer(byte[].class, new ByteArraySerializer());
-        mapper.setDateFormat(new SimpleDateFormat(DATE_TIME_PATTERN));
-        mapper.setAnnotationIntrospector(new FieldIgnoreIntrospector());
         if (!resourceBundle.getAllDocumentations().isEmpty()) {
             module.addKeyDeserializer(Object.class, trackerKeyDeserializer);
             module.addDeserializer(Object.class, new UntypedObjectDeserializer(null, null));
         }
-        mapper.registerModule(module);
-        return mapper;
+        return JsonMapper.builder()
+                .enable(SerializationFeature.INDENT_OUTPUT)
+                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                .changeDefaultPropertyInclusion(incl ->
+                        JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.ALWAYS))
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .defaultDateFormat(new SimpleDateFormat(DATE_TIME_PATTERN))
+                .annotationIntrospector(new FieldIgnoreIntrospector())
+                .addModule(module)
+                .build();
     }
 
     @Bean

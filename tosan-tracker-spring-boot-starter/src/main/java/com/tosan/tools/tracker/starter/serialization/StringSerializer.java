@@ -1,16 +1,15 @@
 package com.tosan.tools.tracker.starter.serialization;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-
-import java.io.IOException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
 /**
  * @author AmirHossein ZamanZade
  * @since 5/17/2023
  */
-public class StringSerializer extends JsonSerializer<String> {
+public class StringSerializer extends ValueSerializer<String> {
 
     private final BaseFieldMaskSerializer baseSerializer;
 
@@ -19,7 +18,8 @@ public class StringSerializer extends JsonSerializer<String> {
     }
 
     @Override
-    public void serialize(String value, JsonGenerator jsonGenerator, SerializerProvider serializers) throws IOException {
+    public void serialize(String value, JsonGenerator jsonGenerator, SerializationContext serializers)
+            throws JacksonException {
         baseSerializer.serialize(value, jsonGenerator, serializers);
     }
 }

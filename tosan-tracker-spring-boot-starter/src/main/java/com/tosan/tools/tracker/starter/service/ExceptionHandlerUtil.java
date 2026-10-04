@@ -1,8 +1,9 @@
 package com.tosan.tools.tracker.starter.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.ClassIntrospector;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.introspect.MixInResolver;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.Map;
 
@@ -12,7 +13,7 @@ import java.util.Map;
  */
 public class ExceptionHandlerUtil {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = JsonMapper.shared();
 
     public <T> Map<String, Object> getExceptionParam(T object) {
         return jsonToMap(objectToJsonForRestException(object, IgnoredExceptionProperties.class));
@@ -38,19 +39,24 @@ public class ExceptionHandlerUtil {
     }
 
     private <T> ObjectMapper createObjectMapperWthMixedInResolver(T object, Class ignoreProperties) {
-        ObjectMapper objectMapperWithMixedIn = objectMapper.copy();
-        objectMapperWithMixedIn.setMixInResolver(new ClassIntrospector.MixInResolver() {
-            @Override
-            public Class<?> findMixInClassFor(Class<?> cls) {
-                return ignoreProperties;
-            }
+        return objectMapper.rebuild()
+                .mixInOverrides(new MixInResolver() {
+                    @Override
+                    public Class<?> findMixInClassFor(Class<?> cls) {
+                        return ignoreProperties;
+                    }
 
-            @Override
-            public ClassIntrospector.MixInResolver copy() {
-                return this;
-            }
-        });
-        objectMapperWithMixedIn.addMixIn(object.getClass(), ignoreProperties);
-        return objectMapperWithMixedIn;
+                    @Override
+                    public boolean hasMixIns() {
+                        return true;
+                    }
+
+                    @Override
+                    public MixInResolver snapshot() {
+                        return this;
+                    }
+                })
+                .addMixIn(object.getClass(), ignoreProperties)
+                .build();
     }
 }
